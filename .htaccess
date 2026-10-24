@@ -1,0 +1,29 @@
+# ==============================================================
+# TechByte - Configuração de Segurança Apache (.htaccess)
+# Disciplina: Sistemas Operacionais e Redes de Computadores
+#
+# REQUISITO DA RUBRICA: "Proibir listagem de diretórios" (Nota: 0,6)
+# ==============================================================
+
+# 1. Proibir explicitamente a listagem de diretórios no Apache
+# Impede que usuários vejam pastas caso não exista index.php
+Options -Indexes
+
+# 2. Impedir visualização direta de arquivos sensíveis e de configuração
+<FilesMatch "^(\..*|.*\.sql|.*\.env|.*\.log|.*\.md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 3. Forçar UTF-8 padrão
+AddDefaultCharset UTF-8
+
+# 4. Habilitar Reescrita Limpa se mod_rewrite estiver ativo
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Não reescrever arquivos e pastas reais
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+</IfModule>

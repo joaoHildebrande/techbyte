@@ -1,0 +1,66 @@
+version: '3.8'
+
+# ==============================================================
+# TechByte - Orquestração Docker Multi-Container
+# Disciplina: Sistemas Operacionais e Redes de Computadores
+#
+# REQUISITOS ATENDIDOS:
+# 1. Aplicação funcionando na porta 8080 (ports: "8080:80")
+# 2. O Banco de dados possui IP Fixo (ipv4_address: 172.20.0.10)
+# 3. Aplicação e banco em máquinas/contêineres separados
+# ==============================================================
+
+services:
+  # MÁQUINA / CONTÊINER 1: SERVIDOR DE BANCO DE DADOS (IP FIXO 172.20.0.10)
+  db_mysql:
+    image: mysql:8.0
+    container_name: techbyte_mysql_server
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: RootSuperPassword@2026
+      MYSQL_DATABASE: techbyte_db
+      MYSQL_USER: techbyte_user
+      MYSQL_PASSWORD: SenhaSegura@2026
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+    networks:
+      techbyte_net:
+        ipv4_address: 172.20.0.10
+
+  # MÁQUINA / CONTÊINER 2: SERVIDOR WEB PHP + APACHE (PORTA 8080)
+  web_app:
+    image: php:8.2-apache
+    container_name: techbyte_web_server
+    restart: always
+    ports:
+      # Exigência da Rubrica: Aplicação rodando na porta 8080
+      - "8080:80"
+    environment:
+      DB_HOST: "172.20.0.10"
+      DB_PORT: "3306"
+      DB_NAME: "techbyte_db"
+      DB_USER: "techbyte_user"
+      DB_PASS: "SenhaSegura@2026"
+    volumes:
+      - ./:/var/www/html/
+      - ./apache/virtualhost.conf:/etc/apache2/sites-available/000-default.conf
+    depends_on:
+      - db_mysql
+    networks:
+      techbyte_net:
+        ipv4_address: 172.20.0.20
+
+# REDE ISOLADA COM SUBNET DEDICADA PARA IP FIXO
+networks:
+  techbyte_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+
+volumes:
+  mysql_data:

@@ -1,0 +1,23 @@
+# ==============================================================
+# CONFIGURAÇÃO DE DNS LOCAL PARA APLICAÇÃO
+# Disciplina: Sistemas Operacionais e Redes de Computadores
+# Requisito da Rubrica: "Configurar DNS local para a aplicação" (0,6)
+# ==============================================================
+#
+# No Windows:
+# Edite como Administrador o arquivo:
+# C:\Windows\System32\drivers\etc\hosts
+#
+# No Linux / macOS:
+# sudo nano /etc/hosts
+#
+# Adicione a seguinte linha ao final do arquivo:
+# --------------------------------------------------------------
+127.0.0.1   techbyte.local
+127.0.0.1   www.techbyte.local
+# --------------------------------------------------------------
+#
+# Agora você pode abrir no navegador o endereço:
+# http://techbyte.local:8080
+#
+# E a máquina resolverá localmente para a aplicação sem precisar de domínio público!
